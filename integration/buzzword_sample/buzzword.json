@@ -1,0 +1,67 @@
+{
+  "paths": {
+    "/all": {
+      "get": {
+        "summary": "Get popularity of all buzzwords",
+        "x-auth-type": "Application & Application User",
+        "responses": {
+          "200": {}
+        },
+        "x-throttling-tier": "Unlimited"
+      }
+    },
+    "/{word}": {
+      "post": {
+        "summary": "Post new buzzwords",
+        "x-auth-type": "None",
+        "responses": {
+          "200": {}
+        },
+        "parameters": [
+          {
+            "allowMultiple": false,
+            "in": "path",
+            "name": "word",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "x-throttling-tier": "Unlimited"
+      },
+      "get": {
+        "summary": "get popularity of a given buzzword",
+        "x-auth-type": "Application & Application User",
+        "responses": {
+          "200": {}
+        },
+        "parameters": [
+          {
+            "allowMultiple": false,
+            "in": "path",
+            "name": "word",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "x-throttling-tier": "Unlimited"
+      }
+    },
+    "/mostPopular": {
+      "get": {
+        "summary": "get most popular ten buzzwords and popularity",
+        "x-auth-type": "Application & Application User",
+        "responses": {
+          "200": {}
+        },
+        "x-throttling-tier": "Unlimited"
+      }
+    }
+  },
+  "swagger": "2.0",
+  "info": {
+    "title": "buzzword",
+    "version": "1.0.0"
+  },
+  "basePath": "/buzzword/1.0.0",
+  "host": "172.16.17.1:8253"
+}
