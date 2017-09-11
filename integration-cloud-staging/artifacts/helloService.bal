@@ -1,7 +1,7 @@
 import ballerina.lang.messages;
 import ballerina.net.http;
 
-@http:configuration {basePath:"/hello"}
+@http:configuration {basePath:"/"}
 service<http> helloWorld {
 
     @http:resourceConfig {
