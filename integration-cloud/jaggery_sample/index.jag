@@ -1,6 +1,0 @@
-<%
-var name = "Jaggery";
-
-print("Hello " + name);
-%>
-
