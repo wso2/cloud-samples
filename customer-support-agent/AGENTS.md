@@ -19,7 +19,7 @@ Deploy all three into the project that the user selected, to the Development env
 Check these with reads. If one fails, stop, say why, and create nothing.
 - Agent Management and Integration are available to this organization.
 - The organization has an Anthropic LLM provider (`list_llm_providers`). If it has none, offer to add one with the secure form now, and continue when it exists.
-- The names `products-api`, `products-mcp` and `customer-support-agent` are free in the project. If one is taken, ask whether to add a suffix, and use the same suffix for all three.
+- The names `products-api`, `products-mcp` and `customer-support-agent` are free in the project. If one is taken, ask the user for a different name and create it with that name.
 
 Then say the plan in one or two sentences: three parts in this project, ready in about 15 minutes.
 
