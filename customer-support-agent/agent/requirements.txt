@@ -1,0 +1,13 @@
+strands-agents[anthropic]==1.58.0
+anthropic==0.125.0
+
+fastapi==0.139.0
+uvicorn[standard]==0.47.0
+pydantic==2.13.4
+python-dotenv==1.1.1
+
+# strands-agents resolves wrapt 2.x, which Agent Manager's auto-instrumentation cannot use.
+wrapt==1.17.3
+
+# Pin the Streamable HTTP client API used for the products MCP server.
+mcp==1.29.0
