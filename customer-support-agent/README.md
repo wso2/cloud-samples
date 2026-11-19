@@ -1,7 +1,7 @@
 # Customer Support Agent
 
 A support agent for a demo outdoor gear store. Users ask about products, stock and store policies, and the agent
-answers with live product data. It shows an AI agent, an MCP server and an API working together across WSO2 Cloud.
+answers with live product data. It shows an AI agent, an MCP server and an API working together across Choreo Cloud.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/architecture-dark.svg">
@@ -27,7 +27,7 @@ Agent Management makes the MCP server and the LLM available to the agent through
 The store is Summit Outdoor, a fictional store. The catalog, stock and policies are mock data, and everything is
 read-only.
 
-## Deploy on WSO2 Cloud
+## Deploy on Choreo Cloud
 
 Deploy all three into the same project, to Development, in this order.
 
@@ -87,7 +87,7 @@ A `404` from the API is reported as "not found"; any other failure as the catalo
 
 | Configurable | Default | Purpose |
 |---|---|---|
-| `productsApiUrl` | empty, which falls back to `PRODUCTS_API_URL` | The Products API's address. On WSO2 Cloud, link it to the API's endpoint |
+| `productsApiUrl` | empty, which falls back to `PRODUCTS_API_URL` | The Products API's address. On Choreo Cloud, link it to the API's endpoint |
 
 ## Customer Support Agent
 

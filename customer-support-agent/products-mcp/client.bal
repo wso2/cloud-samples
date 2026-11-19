@@ -4,7 +4,7 @@ import ballerina/os;
 // The Products API's base path; it serves its routes under it.
 const API_BASE_PATH = "/api/v1";
 
-// The Products API's address. On WSO2 Cloud it is set per environment in the Integration Platform,
+// The Products API's address. On Choreo Cloud it is set per environment in the Integration Platform,
 // to the API's address inside the project, so each deploy of the sample reaches its own API. Locally
 // it falls back to PRODUCTS_API_URL, then to the API on localhost.
 configurable string productsApiUrl = "";

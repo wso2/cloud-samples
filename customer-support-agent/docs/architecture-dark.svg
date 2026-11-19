@@ -12,7 +12,7 @@
     .head{fill:#9aa1b5}
   </style>
   <title id="t">Customer Support Agent architecture</title>
-  <desc id="d">A user chats with the Customer Support Agent in Agent Management. The agent reaches the Products MCP server through an MCP proxy, and Anthropic through an LLM provider, both on the Agent Management gateway. The Products MCP server reads the Products API; both run in Integration. Agent Management and Integration are inside WSO2 Cloud. The user and Anthropic are outside it.</desc>
+  <desc id="d">A user chats with the Customer Support Agent in Agent Management. The agent reaches the Products MCP server through an MCP proxy, and Anthropic through an LLM provider, both on the Agent Management gateway. The Products MCP server reads the Products API; both run in Integration. Agent Management and Integration are inside Choreo Cloud. The user and Anthropic are outside it.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
       <path class="head" d="M0,0 L10,5 L0,10 z"/>
@@ -30,7 +30,7 @@
   <rect class="platform" x="485" y="50" width="250" height="160" rx="10"/>
   <rect class="node" x="500" y="116" width="100" height="54" rx="8"/>
   <rect class="node" x="625" y="116" width="100" height="54" rx="8"/>
-  <!-- Anthropic, outside WSO2 Cloud -->
+  <!-- Anthropic, outside Choreo Cloud -->
   <rect class="outside" x="295" y="332" width="160" height="40" rx="8"/>
   <g class="name">
     <text x="52" y="148">User</text>
@@ -43,7 +43,7 @@
     <text x="675" y="148">Products API</text>
     <text x="375" y="357">Anthropic</text>
   </g>
-  <text class="cloudName" x="119" y="37">WSO2 Cloud</text>
+  <text class="cloudName" x="119" y="37">Choreo Cloud</text>
   <text class="where" x="130" y="71">Agent Management</text>
   <text class="where" x="375" y="107" font-size="12" text-anchor="middle">Gateway</text>
   <text class="where" x="495" y="71">Integration</text>
