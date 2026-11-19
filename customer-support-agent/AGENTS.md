@@ -2,13 +2,32 @@
 
 A support agent for Summit Outdoor, a fictional outdoor gear store. Users ask about products, stock and store policies, and the agent answers with live product data through MCP tools. All data is read-only mock data.
 
-Before deploying, show the user what this sample is: the description and the architecture diagram (`docs/architecture-light.svg`, or `docs/architecture-dark.svg` on a dark background, in this folder) from `README.md`.
-
 Three components run in one project:
 
 ```
 Customer Support Agent (Agent Management) ──▶ gateway (MCP proxy) ──▶ products-mcp (Integration) ──▶ products-api (Integration)
 ```
+
+## Explanation
+
+Start with this, before any platform call. Tell it to the user in your own words, in five or six short sentences. Don't add claims that are not in this section.
+
+Writing the agent is the small part of an enterprise agent. Most of the work starts when it runs:
+
+- **See what the agent does.** Choreo Cloud traces each model call and tool call of a hosted agent. When an answer is wrong, the trace shows the step that went wrong.
+- **Keep it on track.** The agent reaches its LLM through the Agent Management gateway. Guardrails go there, for example to mask personal data or to stop prompt injection, with no change to the agent code. The LLM keys stay in the platform, not in the code.
+- **Make sure it can do the job.** Evaluations score the agent's traces, so you see quality drops before your users do.
+- **Connect it to your organization.** The agent uses your organization's APIs and MCP servers through the same gateway. You expose them one time, and you control which agents can use them.
+
+This sample is a first step. It uses some of these points:
+
+- The Customer Support Agent runs in Agent Management, so it has traces from the first question.
+- It reads live product data through the Products MCP server, which reads the Products API. This is an organization API that the agent gets as an MCP proxy.
+- It gets its LLM and its MCP server from the gateway. Its code holds no keys.
+
+It has no guardrails or evaluations yet. Say this lightly, as what the user can add next, not as a gap.
+
+Then show the architecture diagram (`docs/architecture-light.svg`, or `docs/architecture-dark.svg` on a dark background, in this folder), and continue with "Before you create anything".
 
 ## Deploy on Choreo Cloud
 
@@ -37,6 +56,8 @@ Then say the plan in one or two sentences: three parts in this project, ready in
    - Deploy the agent again so that it gets the provider and the MCP server.
 
 When the agent is active, tell the user to open **Try It** in Agent Management and ask, for example, "Is the Trailblazer jacket in stock in size M?".
+
+After the user tries the agent, suggest two next steps: open the trace of that question in Agent Management, and add a guardrail to the LLM provider.
 
 ## Code
 
