@@ -10,7 +10,7 @@ Three components run in one project:
 Customer Support Agent (Agent Management) ──▶ gateway (MCP proxy) ──▶ products-mcp (Integration) ──▶ products-api (Integration)
 ```
 
-## Deploy on WSO2 Cloud
+## Deploy on Choreo Cloud
 
 Deploy all three into the project that the user selected, to the Development environment. Repository: `https://github.com/wso2/cloud-samples`, branch `master`. The sample is in the `customer-support-agent` folder, so every path below starts with it. Use these values as they are. Don't ask the user for the repository, the branch or a folder.
 

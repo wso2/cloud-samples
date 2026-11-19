@@ -1,6 +1,6 @@
-# WSO2 Cloud samples
+# Choreo Cloud samples
 
-Each folder is one sample, with its own `README.md` and an `AGENTS.md` that tells the WSO2 Cloud agent how to deploy it.
+Each folder is one sample, with its own `README.md` and an `AGENTS.md` that tells Choreo Agent how to deploy it.
 
 | Sample | What it shows |
 |---|---|
