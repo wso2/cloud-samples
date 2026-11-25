@@ -14,6 +14,15 @@ def _env(name: str, default: str | None = None) -> str:
     return val
 
 
+def _env_any(*names: str, default: str | None = None) -> str:
+    for name in names:
+        if os.environ.get(name):
+            return os.environ[name]
+    if default is None:
+        raise RuntimeError(f"Missing required env var: {' or '.join(names)}")
+    return default
+
+
 def _validate_url(name: str, url: str) -> str:
     parsed = urlparse(url)
     if (
@@ -58,13 +67,13 @@ class Config:
             raise RuntimeError("MAX_TOKENS must be a positive whole number")
         return cls(
             products_mcp_url=_validate_url("PRODUCTS_MCP_URL", _env("PRODUCTS_MCP_URL")),
-            mcp_api_key=_env("MCP_API_KEY", ""),
+            mcp_api_key=_env_any("MCP_API_KEY", "PRODUCTS_MCP_API_KEY", default=""),
             use_llm_provider=use_provider,
             # Injected by Agent Manager when an Anthropic LLM provider is bound to the agent.
             llm_provider_url=_validate_url("LLM_PROVIDER_URL", _env("LLM_PROVIDER_URL"))
             if use_provider
             else "",
-            llm_provider_key=_env("LLM_PROVIDER_KEY") if use_provider else "",
+            llm_provider_key=_env_any("LLM_PROVIDER_KEY", "LLM_PROVIDER_API_KEY") if use_provider else "",
             # Local runs without Agent Manager only.
             anthropic_api_key=_env("ANTHROPIC_API_KEY") if not use_provider else "",
             model=_env("MODEL", "claude-opus-5-5"),

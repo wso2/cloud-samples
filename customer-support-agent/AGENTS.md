@@ -40,8 +40,8 @@ Check these with reads. If one fails, stop, say why, and create nothing.
    - Only if `connect_integration` isn't available: deploy once, then set the same configurable for Development to the **internal** URL of the API's deployed endpoint with `set_configurables`, and deploy again.
    - Deploy it. Agent Management adds it as an MCP proxy on its own; wait until that proxy is listed. Don't change the MCP server's endpoint visibility. If the proxy doesn't appear, tell the user.
 4. **Connect the agent.** When the agent's first deploy is done and the proxy is listed:
-   - Attach the MCP proxy, with the environment variable names `PRODUCTS_MCP_URL` for its URL and `MCP_API_KEY` for its key, so Agent Management injects both.
-   - Attach the Anthropic LLM provider, with the environment variable names `LLM_PROVIDER_URL` and `LLM_PROVIDER_KEY`.
+   - Attach the MCP proxy with the configuration name `PRODUCTS_MCP`, so Agent Management injects `PRODUCTS_MCP_URL` and `PRODUCTS_MCP_API_KEY`.
+   - Attach the Anthropic LLM provider with the configuration name `LLM_PROVIDER`, so Agent Management injects `LLM_PROVIDER_URL` and `LLM_PROVIDER_API_KEY`.
    - Deploy the agent again so that it gets the provider and the MCP server.
 
 ### When it is done

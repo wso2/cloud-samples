@@ -97,8 +97,8 @@ Serves `POST /chat` on port `8000` (`{"message", "session_id"}` in, `{"response"
 | Env var | Required | Purpose |
 |---|---|---|
 | `PRODUCTS_MCP_URL` | Yes | The MCP gateway URL plus `/mcp` |
-| `MCP_API_KEY` | When the MCP gateway checks keys | Sent as `X-API-Key`. Store it as a secret |
-| `LLM_PROVIDER_URL`, `LLM_PROVIDER_KEY` | When `USE_LLM_PROVIDER=true` | Injected by Agent Management from the bound Anthropic provider |
+| `MCP_API_KEY` or `PRODUCTS_MCP_API_KEY` | When the MCP gateway checks keys | Sent as `X-API-Key`. Store it as a secret |
+| `LLM_PROVIDER_URL`, and `LLM_PROVIDER_KEY` or `LLM_PROVIDER_API_KEY` | When `USE_LLM_PROVIDER=true` | Injected by Agent Management from the bound Anthropic provider |
 | `USE_LLM_PROVIDER` | No, default `true` | `false` for a local run straight against Anthropic |
 | `ANTHROPIC_API_KEY` | When `USE_LLM_PROVIDER=false` | Local runs only |
 | `MODEL` | No, default `claude-opus-5-5` | Claude model |
