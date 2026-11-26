@@ -103,7 +103,7 @@ Serves `POST /chat` on port `8000` (`{"message", "session_id"}` in, `{"response"
 | `LLM_PROVIDER_PROVIDER` or `LLM_PROVIDER` | No, default `anthropic` | The provider's template: `anthropic`, `openai`, `gemini` or `mistralai`. Injected by Agent Management |
 | `USE_LLM_PROVIDER` | No, default `true` | `false` for a local run straight against Anthropic |
 | `ANTHROPIC_API_KEY` | When `USE_LLM_PROVIDER=false` | Local runs only |
-| `MODEL` | No, default per provider | `claude-opus-5-5`, `gpt-5.6-terra`, `gemini-flash-latest` or `mistral-large-latest` |
+| `MODEL` | No, default per provider | `claude-sonnet-5-5`, `gpt-4o-mini`, `gemini-3.6-flash` or `mistral-small-2603` |
 | `MAX_TOKENS` | No, default `16000` | Cap on each reply |
 | `STORE_NAME` | No, default `Summit Outdoor` | Name used in the instructions |
 
@@ -112,6 +112,9 @@ through it: Anthropic at `<LLM_PROVIDER_URL>/v1/messages` (a trailing `/v1` on t
 `<LLM_PROVIDER_URL>/chat/completions`, Mistral at `<LLM_PROVIDER_URL>/v1/chat/completions`, and Gemini at
 `<LLM_PROVIDER_URL>/v1beta/models/<model>:streamGenerateContent`. Azure OpenAI, Azure AI Foundry and AWS Bedrock aren't
 supported: their model is the user's own deployment or account-enabled model, so the sample has no default to use.
+
+Each default model is one a provider's basic account can use. On Gemini's and Mistral's free tiers, the provider may use
+your requests to improve its models, so don't send real customer data through a free-tier key.
 
 To check the provider wiring without keys, run `python -m pytest tests` in `agent` (with `pytest` installed).
 

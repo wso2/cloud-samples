@@ -47,14 +47,15 @@ def _bool(name: str, default: str) -> bool:
 
 
 # The LLM providers this sample works with, by Agent Management's template name, and the model each
-# uses unless MODEL is set. Providers retire models: check these against each provider's model list
-# when updating the sample. Azure OpenAI, Azure AI Foundry and AWS Bedrock aren't here: their model
+# uses unless MODEL is set: an exact version, not a "latest" alias, that a provider's basic or free
+# account can use, and that streams without extra account checks. Providers retire models: check
+# these against each provider's model list when updating the sample. Azure OpenAI, Azure AI Foundry and AWS Bedrock aren't here: their model
 # is the user's own deployment or account-enabled model, so there is no default to use.
 DEFAULT_MODELS = {
-    "anthropic": "claude-opus-5-5",
-    "openai": "gpt-5.6-terra",
-    "gemini": "gemini-flash-latest",
-    "mistralai": "mistral-large-latest",
+    "anthropic": "claude-sonnet-5-5",
+    "openai": "gpt-4o-mini",
+    "gemini": "gemini-3.6-flash",
+    "mistralai": "mistral-small-2603",
 }
 
 # Where Agent Management puts the provider's template name: LLM_PROVIDER_PROVIDER for a configuration
