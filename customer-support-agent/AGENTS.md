@@ -28,7 +28,7 @@ Then show the architecture diagram (`docs/architecture-light.svg`, or `docs/arch
 
 Check these with reads. If one fails, stop, say why, and create nothing.
 - Agent Management and Integration are available to this organization.
-- The organization has an Anthropic LLM provider (`list_llm_providers`). If it has none, offer to add one with the secure form now, and continue when it exists.
+- The organization has an LLM provider for Anthropic, OpenAI, Gemini or Mistral (`list_llm_providers`). If it has several, ask which to use. If it has none, offer to add one with the secure form now, and continue when it exists. Azure OpenAI, Azure AI Foundry and AWS Bedrock providers don't work with this sample.
 - The names `products-api`, `products-mcp` and `customer-support-agent` are free in the project. If one is taken, ask the user for a different name and create it with that name.
 
 ### Steps
@@ -41,7 +41,7 @@ Check these with reads. If one fails, stop, say why, and create nothing.
    - Deploy it. Agent Management adds it as an MCP proxy on its own; wait until that proxy is listed. Don't change the MCP server's endpoint visibility. If the proxy doesn't appear, tell the user.
 4. **Connect the agent.** When the agent's first deploy is done and the proxy is listed:
    - Attach the MCP proxy with the configuration name `PRODUCTS_MCP`, so Agent Management injects `PRODUCTS_MCP_URL` and `PRODUCTS_MCP_API_KEY`.
-   - Attach the Anthropic LLM provider with the configuration name `LLM_PROVIDER`, so Agent Management injects `LLM_PROVIDER_URL` and `LLM_PROVIDER_API_KEY`.
+   - Attach the LLM provider with the configuration name `LLM_PROVIDER`, so Agent Management injects `LLM_PROVIDER_URL`, `LLM_PROVIDER_API_KEY` and `LLM_PROVIDER_PROVIDER`. The agent picks its model from the provider.
    - Deploy the agent again so that it gets the provider and the MCP server.
 
 ### When it is done
