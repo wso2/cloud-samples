@@ -28,7 +28,7 @@ Then show the architecture diagram (`docs/architecture-light.svg`, or `docs/arch
 
 Check these with reads. If one fails, stop, say why, and create nothing.
 - Agent Management and Integration are available to this organization.
-- The organization has an Anthropic LLM provider (`list_llm_providers`). If it has none, offer to add one with the secure form now, and continue when it exists.
+- The organization has an LLM provider for Anthropic, OpenAI, Gemini or Mistral (`list_llm_providers`). If it has several, ask which to use. If it has none, offer to add one with the secure form now, and continue when it exists. Azure OpenAI, Azure AI Foundry and AWS Bedrock providers don't work with this sample.
 - The names `products-api`, `products-mcp` and `customer-support-agent` are free in the project. If one is taken, ask the user for a different name and create it with that name.
 
 ### Steps
@@ -41,7 +41,8 @@ Check these with reads. If one fails, stop, say why, and create nothing.
    - Deploy it. Agent Management adds it as an MCP proxy on its own; wait until that proxy is listed. Don't change the MCP server's endpoint visibility. If the proxy doesn't appear, tell the user.
 4. **Connect the agent.** When the agent's first deploy is done and the proxy is listed:
    - Attach the MCP proxy with the configuration name `PRODUCTS_MCP`, so Agent Management injects `PRODUCTS_MCP_URL` and `PRODUCTS_MCP_API_KEY`.
-   - Attach the Anthropic LLM provider with the configuration name `LLM_PROVIDER`, so Agent Management injects `LLM_PROVIDER_URL` and `LLM_PROVIDER_API_KEY`.
+   - Attach the LLM provider with the configuration name `LLM_PROVIDER`. Use exactly this name: Agent Management then injects `LLM_PROVIDER_URL`, `LLM_PROVIDER_API_KEY` and `LLM_PROVIDER_PROVIDER`. `LLM_PROVIDER_PROVIDER` is the provider's type (`anthropic`, `openai`, `gemini` or `mistralai`); the agent reads it to choose its client and that provider's default model.
+   - If the provider isn't Anthropic, check that the agent's environment now has `LLM_PROVIDER_PROVIDER`. If it doesn't, this Agent Management version doesn't pass the provider's type yet: tell the user, and attach an Anthropic provider instead.
    - Deploy the agent again so that it gets the provider and the MCP server.
 
 ### When it is done

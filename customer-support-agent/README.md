@@ -16,7 +16,7 @@ answers with live product data. It shows an AI agent, an MCP server and an API w
 **How it fits together:** the agent finds answers through the Products MCP server, which reads the Products API.
 Agent Management makes the MCP server and the LLM available to the agent through its gateway.
 
-**Needs:** an Anthropic LLM provider in Agent Management.
+**Needs:** an LLM provider in Agent Management for Anthropic, OpenAI, Gemini or Mistral.
 
 | Component | Runs on | Path | Language |
 |---|---|---|---|
@@ -51,7 +51,8 @@ It needs no environment variables. Build it, then connect it to the API before y
 In Agent Management, create a platform-hosted Python agent from this repository: app path `/customer-support-agent/agent`, Python 3.11,
 default chat interface. Then:
 
-1. Bind an Anthropic LLM provider, with the env var names `LLM_PROVIDER_URL` and `LLM_PROVIDER_KEY`.
+1. Bind an Anthropic, OpenAI, Gemini or Mistral LLM provider with the configuration name `LLM_PROVIDER`, so the env vars are
+   `LLM_PROVIDER_URL`, `LLM_PROVIDER_API_KEY` and `LLM_PROVIDER_PROVIDER`.
 2. Bind the MCP proxy from step 2, with the env var names `PRODUCTS_MCP_URL` and `MCP_API_KEY`.
 3. Deploy, then open **Try It** and ask, for example, "Is the Trailblazer jacket in stock in size M?".
 
@@ -98,15 +99,24 @@ Serves `POST /chat` on port `8000` (`{"message", "session_id"}` in, `{"response"
 |---|---|---|
 | `PRODUCTS_MCP_URL` | Yes | The MCP gateway URL plus `/mcp` |
 | `MCP_API_KEY` or `PRODUCTS_MCP_API_KEY` | When the MCP gateway checks keys | Sent as `X-API-Key`. Store it as a secret |
-| `LLM_PROVIDER_URL`, and `LLM_PROVIDER_KEY` or `LLM_PROVIDER_API_KEY` | When `USE_LLM_PROVIDER=true` | Injected by Agent Management from the bound Anthropic provider |
+| `LLM_PROVIDER_URL`, and `LLM_PROVIDER_KEY` or `LLM_PROVIDER_API_KEY` | When `USE_LLM_PROVIDER=true` | Injected by Agent Management from the bound LLM provider |
+| `LLM_PROVIDER_PROVIDER` or `LLM_PROVIDER` | No, default `anthropic` | The provider's template: `anthropic`, `openai`, `gemini` or `mistralai`. Injected by Agent Management |
 | `USE_LLM_PROVIDER` | No, default `true` | `false` for a local run straight against Anthropic |
 | `ANTHROPIC_API_KEY` | When `USE_LLM_PROVIDER=false` | Local runs only |
-| `MODEL` | No, default `claude-opus-5-5` | Claude model |
+| `MODEL` | No, default per provider | `claude-sonnet-5-5`, `gpt-4o-mini`, `gemini-3.5-flash-lite` or `mistral-small-2603` |
 | `MAX_TOKENS` | No, default `16000` | Cap on each reply |
 | `STORE_NAME` | No, default `Summit Outdoor` | Name used in the instructions |
 
-The agent sends the provider key in `API-Key`, which the Agent Management gateway reads, and calls
-`<LLM_PROVIDER_URL>/v1/messages` (a trailing `/v1` on the URL is dropped first).
+The agent sends the provider key in `API-Key`, which the Agent Management gateway reads, and calls the provider's own API
+through it: Anthropic at `<LLM_PROVIDER_URL>/v1/messages` (a trailing `/v1` on the URL is dropped first), OpenAI at
+`<LLM_PROVIDER_URL>/chat/completions`, Mistral at `<LLM_PROVIDER_URL>/v1/chat/completions`, and Gemini at
+`<LLM_PROVIDER_URL>/v1beta/models/<model>:streamGenerateContent`. Azure OpenAI, Azure AI Foundry and AWS Bedrock aren't
+supported: their model is the user's own deployment or account-enabled model, so the sample has no default to use.
+
+Each default model is one a provider's basic account can use. On Gemini's and Mistral's free tiers, the provider may use
+your requests to improve its models, so don't send real customer data through a free-tier key.
+
+To check the provider wiring without keys, run `python -m pytest tests` in `agent` (with `pytest` installed).
 
 ## Run locally
 

@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from mcp.client.streamable_http import streamablehttp_client
-from strands import Agent
-from strands.models.anthropic import AnthropicModel
+from strands import Agent, ModelRetryStrategy
+from strands.models import Model
 from strands.tools.mcp import MCPClient
 
 from config import Config
@@ -25,21 +25,55 @@ def create_mcp_client(cfg: Config) -> MCPClient:
     return MCPClient(lambda: streamablehttp_client(cfg.products_mcp_url, headers=headers))
 
 
-def build_model(cfg: Config) -> AnthropicModel:
-    if cfg.use_llm_provider:
+# The Anthropic and OpenAI clients retry a 429 twice on their own, waiting up to a minute each time;
+# the Gemini client doesn't retry. With theirs off, the agent's one quick retry is the only one.
+NO_SDK_RETRIES = 0
+
+
+# Each provider's client is imported only when it is the one used: loading all of them would cost
+# memory the agent doesn't need.
+def build_model(cfg: Config) -> Model:
+    if not cfg.use_llm_provider:
+        from strands.models.anthropic import AnthropicModel
+
+        # No temperature: current Claude models reject sampling parameters.
+        return AnthropicModel(
+            client_args={"api_key": cfg.anthropic_api_key, "max_retries": NO_SDK_RETRIES},
+            model_id=cfg.model,
+            max_tokens=cfg.max_tokens,
+        )
+    # Every call goes to the Agent Management LLM gateway, which reads its key from API-Key and adds
+    # the provider's own key upstream. Each SDK also sends the key in its own header, which the
+    # gateway replaces.
+    url = cfg.llm_provider_url.rstrip("/")
+    key = cfg.llm_provider_key
+    gateway = {"API-Key": key}
+    if cfg.llm_provider == "anthropic":
+        from strands.models.anthropic import AnthropicModel
+
         # The SDK adds /v1/messages itself, so drop a /v1 the provider URL may already end with.
-        base_url = cfg.llm_provider_url.rstrip("/").removesuffix("/v1")
-        # The Agent Manager LLM gateway reads its key from API-Key and adds Anthropic's own key
-        # upstream. The SDK also sends api_key as x-api-key.
-        client_args = {
-            "base_url": base_url,
-            "api_key": cfg.llm_provider_key,
-            "default_headers": {"API-Key": cfg.llm_provider_key},
-        }
-    else:
-        client_args = {"api_key": cfg.anthropic_api_key}
-    # No temperature: current Claude models reject sampling parameters.
-    return AnthropicModel(client_args=client_args, model_id=cfg.model, max_tokens=cfg.max_tokens)
+        client_args = {"base_url": url.removesuffix("/v1"), "api_key": key, "default_headers": gateway, "max_retries": NO_SDK_RETRIES}
+        return AnthropicModel(client_args=client_args, model_id=cfg.model, max_tokens=cfg.max_tokens)
+    if cfg.llm_provider == "openai":
+        from strands.models.openai import OpenAIModel
+
+        # Agent Management's OpenAI provider points at https://api.openai.com/v1, so the gateway URL
+        # already stands for /v1 and the SDK adds /chat/completions.
+        client_args = {"base_url": url, "api_key": key, "default_headers": gateway, "max_retries": NO_SDK_RETRIES}
+        return OpenAIModel(client_args=client_args, model_id=cfg.model, params={"max_completion_tokens": cfg.max_tokens})
+    if cfg.llm_provider == "mistralai":
+        from strands.models.openai import OpenAIModel
+
+        # Mistral's chat API is OpenAI-compatible under /v1; its provider points at https://api.mistral.ai.
+        client_args = {"base_url": f"{url.removesuffix('/v1')}/v1", "api_key": key, "default_headers": gateway, "max_retries": NO_SDK_RETRIES}
+        return OpenAIModel(client_args=client_args, model_id=cfg.model, params={"max_tokens": cfg.max_tokens})
+    if cfg.llm_provider == "gemini":
+        from strands.models.gemini import GeminiModel
+
+        # The Gemini SDK adds /v1beta/models/... to the base URL and sends the key as x-goog-api-key.
+        client_args = {"api_key": key, "http_options": {"base_url": url, "headers": gateway}}
+        return GeminiModel(client_args=client_args, model_id=cfg.model, params={"max_output_tokens": cfg.max_tokens})
+    raise RuntimeError(f"LLM provider '{cfg.llm_provider}' isn't supported by this sample")
 
 
 def build_agent(cfg: Config, tools: list) -> Agent:
@@ -48,4 +82,7 @@ def build_agent(cfg: Config, tools: list) -> Agent:
         tools=tools,
         system_prompt=SYSTEM_PROMPT.format(store=cfg.store_name),
         callback_handler=None,
+        # One quick retry when the provider is busy. Strands' default waits about two minutes in all,
+        # longer than a shopper or the gateway waits, and a key's daily limit won't clear by then.
+        retry_strategy=ModelRetryStrategy(max_attempts=2, initial_delay=2, max_delay=4),
     )
