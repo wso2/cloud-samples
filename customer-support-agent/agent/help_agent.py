@@ -25,6 +25,11 @@ def create_mcp_client(cfg: Config) -> MCPClient:
     return MCPClient(lambda: streamablehttp_client(cfg.products_mcp_url, headers=headers))
 
 
+# The Anthropic and OpenAI clients retry a 429 twice on their own, waiting up to a minute each time;
+# the Gemini client doesn't retry. With theirs off, the agent's one quick retry is the only one.
+NO_SDK_RETRIES = 0
+
+
 # Each provider's client is imported only when it is the one used: loading all of them would cost
 # memory the agent doesn't need.
 def build_model(cfg: Config) -> Model:
@@ -33,7 +38,9 @@ def build_model(cfg: Config) -> Model:
 
         # No temperature: current Claude models reject sampling parameters.
         return AnthropicModel(
-            client_args={"api_key": cfg.anthropic_api_key}, model_id=cfg.model, max_tokens=cfg.max_tokens
+            client_args={"api_key": cfg.anthropic_api_key, "max_retries": NO_SDK_RETRIES},
+            model_id=cfg.model,
+            max_tokens=cfg.max_tokens,
         )
     # Every call goes to the Agent Management LLM gateway, which reads its key from API-Key and adds
     # the provider's own key upstream. Each SDK also sends the key in its own header, which the
@@ -45,20 +52,20 @@ def build_model(cfg: Config) -> Model:
         from strands.models.anthropic import AnthropicModel
 
         # The SDK adds /v1/messages itself, so drop a /v1 the provider URL may already end with.
-        client_args = {"base_url": url.removesuffix("/v1"), "api_key": key, "default_headers": gateway}
+        client_args = {"base_url": url.removesuffix("/v1"), "api_key": key, "default_headers": gateway, "max_retries": NO_SDK_RETRIES}
         return AnthropicModel(client_args=client_args, model_id=cfg.model, max_tokens=cfg.max_tokens)
     if cfg.llm_provider == "openai":
         from strands.models.openai import OpenAIModel
 
         # Agent Management's OpenAI provider points at https://api.openai.com/v1, so the gateway URL
         # already stands for /v1 and the SDK adds /chat/completions.
-        client_args = {"base_url": url, "api_key": key, "default_headers": gateway}
+        client_args = {"base_url": url, "api_key": key, "default_headers": gateway, "max_retries": NO_SDK_RETRIES}
         return OpenAIModel(client_args=client_args, model_id=cfg.model, params={"max_completion_tokens": cfg.max_tokens})
     if cfg.llm_provider == "mistralai":
         from strands.models.openai import OpenAIModel
 
         # Mistral's chat API is OpenAI-compatible under /v1; its provider points at https://api.mistral.ai.
-        client_args = {"base_url": f"{url.removesuffix('/v1')}/v1", "api_key": key, "default_headers": gateway}
+        client_args = {"base_url": f"{url.removesuffix('/v1')}/v1", "api_key": key, "default_headers": gateway, "max_retries": NO_SDK_RETRIES}
         return OpenAIModel(client_args=client_args, model_id=cfg.model, params={"max_tokens": cfg.max_tokens})
     if cfg.llm_provider == "gemini":
         from strands.models.gemini import GeminiModel

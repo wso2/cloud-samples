@@ -67,14 +67,17 @@ class Gateway:
     def __init__(self) -> None:
         self.requests: list[dict] = []
         self.reply = b""
+        self.status = 200
         gateway = self
 
         class Handler(BaseHTTPRequestHandler):
             def do_POST(self):  # noqa: N802
                 body = self.rfile.read(int(self.headers.get("Content-Length", 0)))
                 gateway.requests.append({"path": self.path, "headers": {k.lower(): v for k, v in self.headers.items()}, "body": json.loads(body or b"{}")})
-                self.send_response(200)
-                self.send_header("Content-Type", "text/event-stream")
+                self.send_response(gateway.status)
+                if gateway.status == 429:
+                    self.send_header("Retry-After", "1")
+                self.send_header("Content-Type", "text/event-stream" if gateway.status == 200 else "application/json")
                 self.send_header("Content-Length", str(len(gateway.reply)))
                 self.end_headers()
                 self.wfile.write(gateway.reply)
@@ -155,3 +158,14 @@ def test_the_provider_name_set_by_hand_is_read_too(monkeypatch, gateway):
 def test_an_unsupported_provider_says_which_are_supported(monkeypatch, gateway):
     with pytest.raises(RuntimeError, match="isn't supported by this sample. Bind one of: anthropic, openai, gemini, mistralai"):
         _env(monkeypatch, gateway, "azure-openai")
+
+
+@pytest.mark.parametrize("provider", ["anthropic", "openai", "mistralai", "gemini"])
+def test_a_usage_limit_is_tried_twice_at_most(monkeypatch, gateway, provider):
+    # The provider SDKs' own retries are off; the agent's one quick retry is the only one.
+    cfg = _env(monkeypatch, gateway, provider)
+    gateway.status = 429
+    gateway.reply = json.dumps({"error": {"code": 429, "message": "Too many requests", "type": "rate_limit_error", "status": "RESOURCE_EXHAUSTED"}}).encode()
+    with pytest.raises(Exception):
+        build_agent(cfg, tools=[])("Hi")
+    assert 1 <= len(gateway.requests) <= 2
