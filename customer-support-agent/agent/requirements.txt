@@ -1,5 +1,8 @@
 strands-agents[anthropic,openai,gemini]==1.58.0
+# The provider clients, at the versions the sample is tested with. OpenAI's also serves Mistral.
 anthropic==0.125.0
+openai==2.54.0
+google-genai==2.34.0
 
 fastapi==0.139.0
 uvicorn[standard]==0.47.0
