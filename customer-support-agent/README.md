@@ -103,7 +103,7 @@ Serves `POST /chat` on port `8000` (`{"message", "session_id"}` in, `{"response"
 | `LLM_PROVIDER_PROVIDER` or `LLM_PROVIDER` | No, default `anthropic` | The provider's template: `anthropic`, `openai`, `gemini` or `mistralai`. Injected by Agent Management |
 | `USE_LLM_PROVIDER` | No, default `true` | `false` for a local run straight against Anthropic |
 | `ANTHROPIC_API_KEY` | When `USE_LLM_PROVIDER=false` | Local runs only |
-| `MODEL` | No, default per provider | `claude-sonnet-5-5`, `gpt-4o-mini`, `gemini-3.6-flash` or `mistral-small-2603` |
+| `MODEL` | No, default per provider | `claude-sonnet-5-5`, `gpt-4o-mini`, `gemini-3.5-flash-lite` or `mistral-small-2603` |
 | `MAX_TOKENS` | No, default `16000` | Cap on each reply |
 | `STORE_NAME` | No, default `Summit Outdoor` | Name used in the instructions |
 

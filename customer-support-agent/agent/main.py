@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from strands import Agent
+from strands.types.exceptions import ModelThrottledException
 import uvicorn
 
 load_dotenv()
@@ -115,6 +116,18 @@ def _agent_for(session_id: str) -> Agent:
         return agent
 
 
+def _rate_limited(exc: BaseException) -> bool:
+    """Whether the LLM provider refused the call for its usage limit (HTTP 429), however it is wrapped."""
+    seen: BaseException | None = exc
+    while seen is not None:
+        if isinstance(seen, ModelThrottledException):
+            return True
+        if 429 in (getattr(seen, "status_code", None), getattr(seen, "code", None)):
+            return True
+        seen = seen.__cause__ or seen.__context__
+    return False
+
+
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
@@ -141,6 +154,13 @@ def chat(req: ChatRequest) -> ChatResponse:
         # The MCP connection may have died (a restarted server or gateway). Reconnect on the next chat
         # rather than failing every chat until the agent restarts.
         _reset_mcp()
+        if _rate_limited(exc):
+            # The only provider error worth telling the shopper about: the key's usage limit.
+            raise HTTPException(
+                status_code=429,
+                detail="The LLM provider's usage limit for this key was reached. Try again in a minute, "
+                "or use a key with a higher limit.",
+            ) from exc
         raise HTTPException(status_code=500, detail="agent invocation failed") from exc
 
     return ChatResponse(response=str(result), session_id=session_id)

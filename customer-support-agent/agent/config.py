@@ -54,7 +54,7 @@ def _bool(name: str, default: str) -> bool:
 DEFAULT_MODELS = {
     "anthropic": "claude-sonnet-5-5",
     "openai": "gpt-4o-mini",
-    "gemini": "gemini-3.6-flash",
+    "gemini": "gemini-3.5-flash-lite",
     "mistralai": "mistral-small-2603",
 }
 
