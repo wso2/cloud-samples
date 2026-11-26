@@ -42,6 +42,7 @@ Check these with reads. If one fails, stop, say why, and create nothing.
 4. **Connect the agent.** When the agent's first deploy is done and the proxy is listed:
    - Attach the MCP proxy with the configuration name `PRODUCTS_MCP`, so Agent Management injects `PRODUCTS_MCP_URL` and `PRODUCTS_MCP_API_KEY`.
    - Attach the LLM provider with the configuration name `LLM_PROVIDER`. Use exactly this name: Agent Management then injects `LLM_PROVIDER_URL`, `LLM_PROVIDER_API_KEY` and `LLM_PROVIDER_PROVIDER`. `LLM_PROVIDER_PROVIDER` is the provider's type (`anthropic`, `openai`, `gemini` or `mistralai`); the agent reads it to choose its client and that provider's default model.
+   - If the provider isn't Anthropic, check that the agent's environment now has `LLM_PROVIDER_PROVIDER`. If it doesn't, this Agent Management version doesn't pass the provider's type yet: tell the user, and attach an Anthropic provider instead.
    - Deploy the agent again so that it gets the provider and the MCP server.
 
 ### When it is done
